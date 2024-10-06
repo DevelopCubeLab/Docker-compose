@@ -1,0 +1,12 @@
+dongchenshuo@Codes-MacBook-Pro-2023 ~ % docker container ls
+CONTAINER ID   IMAGE                     COMMAND                  CREATED              STATUS              PORTS                    NAMES
+f8e00295f675   docker-compose-service1   "java -jar /app/serv¡­"   About a minute ago   Up About a minute   0.0.0.0:8199->8199/tcp   docker-compose-service1-1
+3840c1e25726   docker-compose-service2   "python main.py"         4 minutes ago        Up About a minute   5000/tcp                 docker-compose-service2-1
+
+
+dongchenshuo@Codes-MacBook-Pro-2023 ~ % docker network ls
+NETWORK ID     NAME                       DRIVER    SCOPE
+aa8d51966c59   bridge                     bridge    local
+8362a219e1ed   docker-compose_mynetwork   bridge    local
+019b66317578   host                       host      local
+6257a710ae79   none                       null      local
