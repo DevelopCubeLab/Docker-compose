@@ -21,8 +21,17 @@ public class MainController {
     @Autowired
     private RestTemplate restTemplate;
 
+    private boolean isProcessing = false;
+
     @GetMapping("/")
     public Map<String, Object> getInformation() {
+
+        if (isProcessing) {
+            // If the service is processing the request, return 429 Too Many Requests
+            throw new RuntimeException("Service is busy. Please try again later.");
+        }
+
+        isProcessing = true;
 
         //create a response object
         Map<String, Object> response = new LinkedHashMap<>();
@@ -49,6 +58,13 @@ public class MainController {
             response.put("Service2", service2Response.getBody());
         } catch (Exception e) {
             response.put("Service2", "Error: " + e.getMessage());
+        } finally {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt(); // resume interrupted state
+            }
+            isProcessing = false;
         }
 
         return response;

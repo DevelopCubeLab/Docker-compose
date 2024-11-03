@@ -1,22 +1,51 @@
-version: '1'
+version: '2'
 services:
-  service1:
+  service1-1:
     build:
-      context: ./server1    # service 1 folder
+      context: ./server1
     ports:
-      - "8199:8199"
-    depends_on:
-      - service2
+      - "8199"
     networks:
       - mynetwork
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+
+  service1-2:
+      build:
+        context: ./server1
+      networks:
+        - mynetwork
+      environment:
+        - SPRING_PROFILES_ACTIVE=prod
+
+  service1-3:
+      build:
+        context: ./server1
+      networks:
+        - mynetwork
+      environment:
+        - SPRING_PROFILES_ACTIVE=prod
 
   service2:
     build:
       context: ./server2     # service 2 folder
     expose:
       - "5000"
+    networks:
+      - mynetwork
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8198:80"
+    depends_on:
+      - service1-1
+      - service1-2
+      - service1-3
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf  # Mount Nginx configuration file
+      - ./nginx/index.html:/usr/share/nginx/html/index.html  # Mount static page
+      - ./login.txt:/etc/nginx/login.txt  # Mount the login.txt file that stores login information
     networks:
       - mynetwork
 

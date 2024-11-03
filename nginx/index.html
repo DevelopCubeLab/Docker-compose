@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NGINX hands on</title>
+
+    <script>
+        function sendRequest() {
+            fetch('/request')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    document.getElementById('responseText').innerHTML = data;
+                })
+                .catch(error => {
+                    document.getElementById('responseText').innerHTML = 'There was a problem with server1';
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        }
+
+        function stopService() {
+            fetch('/stop', { method: 'POST' })
+                .then(() => {
+                    alert('Service is stopping...');
+                });
+        }
+    </script>
+
+</head>
+<body>
+    <h1>NGINX hands on</h1>
+    <button onclick="sendRequest()">Send request</button>
+    <br>
+    <button onclick="stopService()">Stop service</button>
+    <br>
+    <div id="responseText"></div>
+
+</body>
+</html>
