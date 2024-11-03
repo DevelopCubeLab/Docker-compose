@@ -1,12 +1,15 @@
-dongchenshuo@Codes-MacBook-Pro-2023 ~ % docker container ls
-CONTAINER ID   IMAGE                     COMMAND                  CREATED              STATUS              PORTS                    NAMES
-f8e00295f675   docker-compose-service1   "java -jar /app/serv¡­"   About a minute ago   Up About a minute   0.0.0.0:8199->8199/tcp   docker-compose-service1-1
-3840c1e25726   docker-compose-service2   "python main.py"         4 minutes ago        Up About a minute   5000/tcp                 docker-compose-service2-1
+dongchenshuo@Codes-MacBook-Pro-2023 Docker-compose % docker container ls
+CONTAINER ID   IMAGE                       COMMAND                  CREATED              STATUS              PORTS                     NAMES
+c9bdff110050   nginx:latest                "/docker-entrypoint.¡­"   About a minute ago   Up About a minute   0.0.0.0:8198->80/tcp      docker-compose-nginx-1
+06e7c5ff096a   docker-compose-service1-2   "java -jar /app/serv¡­"   13 minutes ago       Up About a minute   8199/tcp                  docker-compose-service1-2-1
+01ab81139b6b   docker-compose-service1-1   "java -jar /app/serv¡­"   13 minutes ago       Up About a minute   0.0.0.0:52608->8199/tcp   docker-compose-service1-1-1
+c7c59d8b9205   docker-compose-service1-3   "java -jar /app/serv¡­"   13 minutes ago       Up About a minute   8199/tcp                  docker-compose-service1-3-1
+0bd6642a011d   docker-compose-service2     "python main.py"         4 hours ago          Up About a minute   5000/tcp                  docker-compose-service2-1
 
 
-dongchenshuo@Codes-MacBook-Pro-2023 ~ % docker network ls
+dongchenshuo@Codes-MacBook-Pro-2023 Docker-compose % docker network ls  
 NETWORK ID     NAME                       DRIVER    SCOPE
-aa8d51966c59   bridge                     bridge    local
-8362a219e1ed   docker-compose_mynetwork   bridge    local
-019b66317578   host                       host      local
-6257a710ae79   none                       null      local
+4e0e4b564fd7   bridge                     bridge    local
+08bc7258c1d4   docker-compose_mynetwork   bridge    local
+8ee50af305d4   host                       host      local
+9b133ddd3d7a   none                       null      local

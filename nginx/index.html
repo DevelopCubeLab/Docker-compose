@@ -23,9 +23,9 @@
         }
 
         function stopService() {
-            fetch('/stop', { method: 'POST' })
+            fetch('/stop', { method: 'GET' })
                 .then(() => {
-                    alert('Service is stopping...');
+                    alert('Please wait...');
                 });
         }
     </script>

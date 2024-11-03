@@ -1,8 +1,11 @@
 package com.se140.server1;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
@@ -22,6 +25,9 @@ public class MainController {
     private RestTemplate restTemplate;
 
     private boolean isProcessing = false;
+
+    @Value("${SERVER_ID:null}")  // The default value is "unknown"
+    private String serverId;
 
     @GetMapping("/")
     public Map<String, Object> getInformation() {
@@ -58,13 +64,21 @@ public class MainController {
             response.put("Service2", service2Response.getBody());
         } catch (Exception e) {
             response.put("Service2", "Error: " + e.getMessage());
-        } finally {
+        }
+
+        new Thread(() -> {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt(); // resume interrupted state
+            } finally {
+                isProcessing = false; // Request processing completed
             }
-            isProcessing = false;
+        }).start();
+
+
+        if (serverId != null && !serverId.equals("null")) {
+            response.put("Response Server 1 ID", serverId);
         }
 
         return response;
@@ -80,5 +94,18 @@ public class MainController {
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         return reader.lines().collect(Collectors.joining("\n"));
     }
+
+    @GetMapping("/stop")
+    public ResponseEntity<String> stopService() {
+        try {
+            Runtime.getRuntime().exec("docker-compose down");
+            Runtime.getRuntime().exec("docker stop");
+            return ResponseEntity.ok("All services are stopping...");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error stopping services: " + e.getMessage());
+        }
+    }
+
 
 }
