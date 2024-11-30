@@ -1,6 +1,6 @@
 stages:
+  - clone
   - build
-  - deploy
   - test
   - cleanup
 
@@ -11,11 +11,13 @@ variables:
 services:
   - docker:dind
 
-before_script:
-  - apk add --no-cache docker-compose
-  - docker info
-  - docker-compose build
-  - docker-compose up -d
+clone:
+  stage: clone
+  script:
+    - echo "Cloning GitHub repository..."
+    - apk add git
+    - git clone https://github.com/DevelopCubeLab/Docker-compose.git .
+    - ls -al
 
 build:
   stage: build
@@ -23,27 +25,17 @@ build:
     - echo "Building Docker images..."
     - docker-compose build
 
-deploy:
-  stage: deploy
-  script:
-    - echo "Deploying services..."
-    - docker-compose up -d
-  rules:
-    - if: $CI_COMMIT_BRANCH == "project"
-
 test:
   stage: test
   script:
-    - echo "Running tests in tests directory..."
+    - echo "Running tests from GitHub repository..."
     - cd tests
     - npm install
     - npm test
-  dependencies:
-    - deploy
 
 cleanup:
   stage: cleanup
   script:
-    - echo "Stopping and cleaning up containers..."
+    - echo "Cleaning up resources..."
     - docker-compose down
   when: always
