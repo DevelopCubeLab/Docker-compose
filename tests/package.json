@@ -1,0 +1,16 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "Docker Compose Project Test",
+  "type": "module",
+  "scripts": {
+    "test": "mocha *.test.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "^5.1.2",
+    "axios": "^1.6.0",
+    "mocha": "^10.8.2"
+  }
+}
