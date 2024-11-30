@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 services:
   service1-1:
     build:
@@ -36,6 +36,7 @@ services:
       - "5000"
     networks:
       - mynetwork
+    stop_grace_period: 0.1s # Set the timeout period for the container to stop
 
   nginx:
     image: nginx:latest

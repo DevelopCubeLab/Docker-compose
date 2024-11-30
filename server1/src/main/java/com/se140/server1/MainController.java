@@ -4,15 +4,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,15 +26,33 @@ public class MainController {
 
     private boolean isProcessing = false;
 
+    private String state = "";
+    private String log = "";
+
+    public static final String INIT = "INIT";
+    public static final String PAUSED = "PAUSED";
+    public static final String RUNNING = "RUNNING";
+    public static final String SHUTDOWN = "SHUTDOWN";
+
     @Value("${SERVER_ID:null}")  // The default value is "unknown"
     private String serverId;
+
+    public MainController() {
+        state = INIT;
+        log =  serverId + ": " + new Date() + ": " + this.state + "\n";
+    }
 
     @GetMapping("/")
     public Map<String, Object> getInformation() {
 
+        if (state.equals(PAUSED)) {
+            // If the service is paused, return 503 Service Unavailable
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Service is paused. Please try again later.");
+        }
+
         if (isProcessing) {
             // If the service is processing the request, return 429 Too Many Requests
-            throw new RuntimeException("Service is busy. Please try again later.");
+            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "Service is busy. Please try again later.");
         }
 
         isProcessing = true;
@@ -99,6 +118,8 @@ public class MainController {
         try {
             Runtime.getRuntime().exec("docker-compose down");
             Runtime.getRuntime().exec("docker stop");
+            setState(SHUTDOWN);
+            state = SHUTDOWN;
             return ResponseEntity.ok("All services are stopping...");
         } catch (IOException e) {
             e.printStackTrace();
@@ -106,5 +127,43 @@ public class MainController {
         }
     }
 
+    // Get the state of the service
+    @GetMapping("/state")
+    public String getState() {
+        return state;
+    }
+
+    // Set the state of the service
+    @PutMapping("/state")
+    public String setState(@RequestParam String state) {
+        switch (state) {
+            case PAUSED:
+                if (this.state.equals(PAUSED)) {
+                    break;
+                }
+                setLog(PAUSED);
+                this.state = PAUSED;
+                break;
+            case RUNNING:
+                if (this.state.equals(RUNNING)) {
+                    break;
+                }
+                setLog(RUNNING);
+                this.state = RUNNING;
+                break;
+            default:
+                throw new RuntimeException("Invalid state: " + state);
+        }
+        return this.state;
+    }
+
+    @GetMapping("/run-log")
+    public String getRunLog() {
+        return log;
+    }
+
+    private void setLog(String state) {
+        log += serverId + ": " + new Date() + ": " + this.state + "->" + state + "\n";
+    }
 
 }
