@@ -15,10 +15,15 @@ build:
 test:
   stage: test
   script:
+    - echo "Starting services for testing..."
+    - docker-compose up -d
     - echo "Running tests..."
     - cd tests
     - npm install
     - npm test
+  after_script:
+    - echo "Stopping services after tests..."
+    - docker-compose down
 
 cleanup:
   stage: cleanup
