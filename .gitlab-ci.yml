@@ -9,17 +9,19 @@ variables:
   DOCKER_TLS_CERTDIR: ""
 
 services:
-  - name: docker:dind
-    command: ["--privileged"]
+  - docker:dind
 
 before_script:
+  - apk add --no-cache docker-compose
   - docker info
+  - docker-compose build
+  - docker-compose up -d
 
 build:
   stage: build
   script:
     - echo "Building Docker images..."
-    - docker-compose build 
+    - docker-compose build
 
 deploy:
   stage: deploy
@@ -27,20 +29,21 @@ deploy:
     - echo "Deploying services..."
     - docker-compose up -d
   rules:
-    - if: $CI_COMMIT_BRANCH == "project" 
+    - if: $CI_COMMIT_BRANCH == "project"
 
 test:
   stage: test
   script:
-    - echo "Running tests..."
-    - docker ps
-    - docker-compose exec app npm test
+    - echo "Running tests in tests directory..."
+    - cd tests
+    - npm install
+    - npm test
   dependencies:
     - deploy
 
 cleanup:
   stage: cleanup
   script:
-    - echo "Cleaning up containers..."
+    - echo "Stopping and cleaning up containers..."
     - docker-compose down
   when: always
