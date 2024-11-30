@@ -41,6 +41,7 @@ services:
   nginx:
     image: nginx:latest
     ports:
+      - "8197:80"
       - "8198:80"
     depends_on:
       - service1-1
