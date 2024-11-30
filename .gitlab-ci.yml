@@ -1,0 +1,42 @@
+stages:
+  - build
+  - deploy
+  - test
+  - cleanup
+
+variables:
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_TLS_CERTDIR: ""
+
+services:
+  - docker:dind
+
+before_script:
+  - docker info
+  - docker-compose version
+
+build:
+  stage: build
+  script:
+    - docker-compose build
+
+deploy:
+  stage: deploy
+  script:
+    - docker-compose up -d
+  rules:
+    - if: $CI_COMMIT_BRANCH == "project"
+
+test:
+  stage: test
+  script:
+    - docker ps
+    - docker-compose exec app npm test
+  dependencies:
+    - deploy
+
+cleanup:
+  stage: cleanup
+  script:
+    - docker-compose down
+  when: always
