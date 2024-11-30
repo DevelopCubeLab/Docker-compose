@@ -1,15 +1,11 @@
 stages:
-  - clone
   - build
   - test
   - cleanup
 
-clone:
-  stage: clone
-  script:
-    - echo "Cloning GitHub repository..."
-    - git clone https://github.com/DevelopCubeLab/Docker-compose.git .
-    - ls -al
+variables:
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_TLS_CERTDIR: ""
 
 build:
   stage: build
