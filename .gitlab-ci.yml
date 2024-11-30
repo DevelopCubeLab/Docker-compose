@@ -4,18 +4,10 @@ stages:
   - test
   - cleanup
 
-variables:
-  DOCKER_HOST: tcp://docker:2375/
-  DOCKER_TLS_CERTDIR: ""
-
-services:
-  - docker:dind
-
 clone:
   stage: clone
   script:
     - echo "Cloning GitHub repository..."
-    - apk add git
     - git clone https://github.com/DevelopCubeLab/Docker-compose.git .
     - ls -al
 
@@ -28,7 +20,7 @@ build:
 test:
   stage: test
   script:
-    - echo "Running tests from GitHub repository..."
+    - echo "Running tests..."
     - cd tests
     - npm install
     - npm test
