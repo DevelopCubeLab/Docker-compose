@@ -1,42 +1,33 @@
 stages:
   - build
-  - deploy
   - test
   - cleanup
 
 variables:
-  DOCKER_HOST: tcp://docker:2375/
-  DOCKER_TLS_CERTDIR: ""
-
-services:
-  - docker:dind
-
-before_script:
-  - docker info
-  - docker-compose version
+  DOCKER_HOST: unix:///var/run/docker.sock
 
 build:
   stage: build
   script:
+    - echo "Building Docker images..."
     - docker-compose build
-
-deploy:
-  stage: deploy
-  script:
-    - docker-compose up -d
-  rules:
-    - if: $CI_COMMIT_BRANCH == "project"
 
 test:
   stage: test
   script:
-    - docker ps
-    - docker-compose exec app npm test
-  dependencies:
-    - deploy
+    - echo "Starting services for testing..."
+    - docker-compose up -d
+    - echo "Running tests..."
+    - cd tests
+    - npm install
+    - npm test
+  after_script:
+    - echo "Stopping services after tests..."
+    - docker-compose down
 
 cleanup:
   stage: cleanup
   script:
+    - echo "Cleaning up resources..."
     - docker-compose down
   when: always
